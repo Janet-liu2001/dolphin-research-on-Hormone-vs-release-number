@@ -1,0 +1,88 @@
+---
+title: "Dolphin"
+author: "Zhaonan Liu"
+date: "2021/6/7"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r cars}
+summary(cars)
+```
+
+```{r}
+library(janitor)
+library(tidyverse)
+library(survey)
+library(ggplot2)
+Ref1_H <- read_csv("dolphin_blubber_hormones.csv")
+
+Ref1_H <- 
+  Ref1_H %>% 
+  select(sex,
+         season,
+         analyte,
+         value, 
+         units)
+glimpse(Ref1_H)
+
+Ref1_H$season = ifelse(Ref1_H$season=='spring',1, ifelse(Ref1_H$season=='summer',2,ifelse(Ref1_H$season=='fall',3,ifelse(Ref1_H$season=='winter',4,NA)))
+                       
+                       
+                       )
+
+```
+
+```{r}
+Ref1_H_female = Ref1_H%>%
+  filter(sex == 'female', analyte == 'progesterone')
+
+Ref1_H_female$Progesterone_ng_per_g_ww = as.factor(Ref1_H_female$value)
+Ref1_H_female$Seasons = as.factor(Ref1_H_female$season)
+
+ggplot(Ref1_H_female, aes(x=Seasons, y=Progesterone_ng_per_g_ww, color= "red")) + geom_point()+ggtitle("Scatterplot of Female Progesterone in Different Seasons from Ref1")+ ylab("Progesterone ng/g wet weight") + geom_point(size=4)
+
+```
+
+```{r}
+Ref1_H_male = Ref1_H%>%
+  filter(sex == 'male', analyte == 'testosterone')
+
+Ref1_H_male$value = as.factor(Ref1_H_male$value)
+Ref1_H_male$Seasons = as.factor(Ref1_H_male$season)
+
+ggplot(Ref1_H_male, aes(x=Seasons, y=value)) + geom_point()+ggtitle("Scatterplot of Malse Testosterone in Different Seasons from Ref1")+ ylab("Testosterone ng/g wet weight") + geom_point(size=2, color= "green")+coord_cartesian(ylim = c(0, 70))
+```
+
+```{r}
+Ref2_H <- read_csv("Ref2.csv")
+
+Ref2_H$Season = ifelse(Ref2_H$Season=='Spring',1, ifelse(Ref2_H$Season=='Summer',2,ifelse(Ref2_H$Season=='Fall',3,NA)))
+
+
+```
+
+```{r}
+Ref2_H_female = Ref2_H%>%
+  filter(Testosterone_nmolperL_Progesterone  == 'Progesterone')
+
+Ref2_H_female$Progesterone = as.factor(Ref2_H_female$value)
+Ref2_H_female$Seasons = as.factor(Ref2_H_female$Season)
+
+ggplot(Ref2_H_female, aes(x=Seasons, y=Progesterone, color= "red")) + geom_point()+ggtitle("Scatterplot of Female Progesterone in Different Seasons from Ref2")+ ylab("Progesterone nmol/L") + geom_point(size=5,shape=2)
+
+```
+
+```{r}
+Ref2_H_male = Ref2_H%>%
+  filter(Testosterone_nmolperL_Progesterone  == 'Testosterone')
+
+Ref2_H_male$Testosterone = as.factor(Ref2_H_male$value)
+Ref2_H_male$Seasons = as.factor(Ref2_H_female$Season)
+
+ggplot(Ref2_H_male, aes(x=Seasons, y=Testosterone)) + geom_point()+ggtitle("Scatterplot of Male Testosterone in Different Seasons from Ref2")+ ylab("Progesterone nmol/L") + geom_point(size=5,shape=2,color= "green")
+```
+

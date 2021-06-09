@@ -1,0 +1,188 @@
+---
+title: "Dolphin"
+author: "Zhaonan Liu"
+date: "2021/6/7"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r cars}
+summary(cars)
+```
+
+```{r}
+library(janitor)
+library(tidyverse)
+library(survey)
+library(ggplot2)
+Ref1_H <- read_csv("dolphin_blubber_hormones.csv")
+
+Ref1_H <- 
+  Ref1_H %>% 
+  select(sex,
+         season,
+         analyte,
+         value, 
+         units)
+glimpse(Ref1_H)
+
+
+                       
+                       
+                  
+
+```
+
+```{r}
+Ref1_H_female = Ref1_H%>%
+  filter(sex == 'female', analyte == 'progesterone')
+
+Ref1_H_female$Progesterone_ng_per_g_ww = as.factor(Ref1_H_female$value)
+Ref1_H_female$Seasons = as.factor(Ref1_H_female$season)
+
+ggplot(Ref1_H_female, aes(x=Seasons, y=Progesterone_ng_per_g_ww, color= "red")) + geom_point()+ggtitle("Scatterplot of Female Progesterone in Different Seasons from Ref1")+ ylab("Progesterone ng/g wet weight") + geom_point(size=4)
+
+```
+
+```{r}
+Ref1_H_male = Ref1_H%>%
+  filter(sex == 'male', analyte == 'testosterone')
+
+fall = Ref1_H_male%>%
+  filter(season == 'fall')
+
+winter = Ref1_H_male%>%
+  filter(season == 'winter')
+
+spring = Ref1_H_male%>%
+  filter(season == 'spring')
+
+summer = Ref1_H_male%>%
+  filter(season == 'summer')
+a=mean(spring$value)
+b=mean(summer$value)
+c=mean(fall$value)
+d=mean(winter$value)
+
+hermon=c(a,b,c,d)
+
+Ref1_H_male$value = as.factor(Ref1_H_male$value)
+Ref1_H_male$Seasons = as.factor(Ref1_H_male$season)
+max(Ref1_H_male$season)
+
+ggplot(Ref1_H_male, aes(x=Seasons, y=value)) + geom_point()+ggtitle("Scatterplot of Malse Testosterone in Different Seasons from Ref1")+ ylab("Testosterone ng/g wet weight") + geom_point(size=2, color= "green")+coord_cartesian(ylim = c(0, 70))
+```
+
+```{r}
+Ref2_H <- read_csv("Ref2.csv")
+
+```
+
+```{r}
+Ref2_H_female = Ref2_H%>%
+  filter(Testosterone_nmolperL_Progesterone  == 'Progesterone')
+
+Ref2_H_female$Progesterone = as.factor(Ref2_H_female$value)
+Ref2_H_female$Seasons = as.factor(Ref2_H_female$Season)
+
+ggplot(Ref2_H_female, aes(x=Seasons, y=Progesterone, color= "red")) + geom_point()+ggtitle("Scatterplot of Female Progesterone in Different Seasons from Ref2")+ ylab("Progesterone nmol/L") + geom_point(size=5,shape=2)
+
+```
+
+```{r}
+Ref2_H_male = Ref2_H%>%
+  filter(Testosterone_nmolperL_Progesterone  == 'Testosterone')
+
+fall = Ref2_H_male%>%
+  filter(season == 'fall')
+
+winter = Ref2_H_male%>%
+  filter(season == 'winter')
+
+spring = Ref2_H_male%>%
+  filter(season == 'spring')
+
+summer = Ref2_H_male%>%
+  filter(season == 'summer')
+a=mean(spring$value)
+b=mean(summer$value)
+c=mean(fall$value)
+d=mean(winter$value)
+
+hermon2=c(a,b,c,d)
+
+Ref2_H_male$Testosterone = as.factor(Ref2_H_male$value)
+Ref2_H_male$Seasons = as.factor(Ref2_H_male$Season)
+
+ggplot(Ref2_H_male, aes(x=Seasons, y=Testosterone)) + geom_point()+ggtitle("Scatterplot of Male Testosterone in Different Seasons from Ref2")+ ylab("Trogesterone nmol/L") + geom_point(size=5,shape=2,color= "green")
+```
+
+```{r}
+Ref3_H_male <- read_csv("Ref3.csv")
+
+fall = Ref3_H_male%>%
+  filter(Season == 'Fall')
+
+winter = Ref3_H_male%>%
+  filter(Season == 'Winter')
+
+spring = Ref3_H_male%>%
+  filter(Season == 'Spring')
+
+summer = Ref3_H_male%>%
+  filter(Season == 'Summer')
+a=mean(spring$value)
+b=mean(summer$value)
+c=mean(fall$value)
+d=mean(winter$value)
+
+hermon2=c(a,b,c,d)
+
+
+Ref3_H_male$Season = ifelse(Ref3_H_male$Season=='Spring',1, ifelse(Ref3_H_male$Season=='Summer',2,ifelse(Ref3_H_male$Season=='Fall',3,ifelse(Ref3_H_male$Season=='Winter',4,NA))))
+
+
+Ref3_H_male$Testosterone = as.factor(Ref3_H_male$value)
+Ref3_H_male$Seasons = as.factor(Ref3_H_male$Season)
+
+ggplot(Ref3_H_male, aes(x=Seasons, y=Testosterone)) + geom_point()+ggtitle("Scatterplot of Male Testosterone in Different Seasons from Ref3")+ ylab("Fecal Trogesterone ng/g dry wieght") + geom_point(size=5,shape=3,color= "green")
+
+```
+
+```{r}
+Ref4_H <- read_csv("Ref4.csv")
+
+Ref4_H$Season = ifelse(Ref4_H$Season=='Spring',1, ifelse(Ref4_H$Season=='Summer',2,ifelse(Ref4_H$Season=='Fall',3,ifelse(Ref4_H$Season=='Winter',4,NA))))
+counts= table(Ref4_H$Season)
+
+barplot(counts,xlab="Month",ylab="#Releases",col="white",
+main="Number Released in Different Seasons from Ref4",border="Blue")
+```
+
+```{r}
+Ref5_H <- read_csv("Ref5.csv")
+
+Ref5_H$Season = ifelse(Ref5_H$Season=='Spring',1, ifelse(Ref5_H$Season=='Summer',2,ifelse(Ref5_H$Season=='Fall',3,ifelse(Ref5_H$Season=='Winter',4,NA))))
+counts= table(Ref5_H$Season)
+```
+
+
+```{r}
+barplot(counts,xlab="Month",ylab="#Releases",col="white",
+main="Number Released in Different Seasons from Ref5",border="black")
+```
+
+```{r}
+Re1= c(2,1,2,6)
+Re2= c(2,2,3,5)
+hermon1
+hermon2
+res1 <- cor.test(hermon1, Re1)
+res1
+res2 <- cor.test(hermon2, Re2)
+res2
+```
+
